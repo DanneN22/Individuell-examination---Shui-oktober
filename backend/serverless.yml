@@ -1,0 +1,81 @@
+service: norrby-board
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-north-1
+  # profile: norrby-dev   # <- valfritt: avkommentera om du vill låsa till en AWS CLI-profil
+  environment:
+    TABLE_NAME: ${self:service}-messages-${sls:stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Scan
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:provider.environment.TABLE_NAME}
+  httpApi:
+    cors:
+      allowedOrigins:
+        - '*'              # byt till din S3/CloudFront-origin i produktion
+      allowedHeaders:
+        - Content-Type
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      allowCredentials: false
+
+plugins:
+  - serverless-offline
+
+functions:
+  listMessages:
+    handler: src/handlers.listMessages
+    events:
+      - httpApi:
+          path: /messages
+          method: get
+
+  createMessage:
+    handler: src/handlers.createMessage
+    events:
+      - httpApi:
+          path: /messages
+          method: post
+
+  updateMessage:
+    handler: src/handlers.updateMessage
+    events:
+      - httpApi:
+          path: /messages/{id}
+          method: put
+
+  deleteMessage:
+    handler: src/handlers.deleteMessage
+    events:
+      - httpApi:
+          path: /messages/{id}
+          method: delete
+
+resources:
+  Resources:
+    MessagesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TABLE_NAME}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
