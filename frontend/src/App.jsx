@@ -60,7 +60,7 @@ export default function App() {
   return (
     <div style={{maxWidth: 720, margin: '0 auto', padding: 24, fontFamily: 'system-ui, sans-serif'}}>
       <header style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16}}>
-        <h1 style={{margin:0}}>Anslagstavla</h1>
+        <h1 style={{margin:0}}>Anslagstavla v1.0</h1>
         <button onClick={load} disabled={loading}>{loading ? 'Laddar…' : 'Uppdatera'}</button>
       </header>
 
