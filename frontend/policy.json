@@ -5,6 +5,6 @@
     "Effect":"Allow",
     "Principal":"*",
     "Action":["s3:GetObject"],
-    "Resource":["arn:aws:s3:::norrby-frontend-1761770672/*"]
+    "Resource":["arn:aws:s3:::shuiinviduell/*"]
   }]
 }
